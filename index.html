@@ -204,6 +204,11 @@
     fetchAndRenderItems();
 
 
+    
+
+    
+
+
     async function renderGroupedItems() {
       const container = document.getElementById("itemsContainer");
       container.innerHTML = "⏳ Loading items...";
@@ -222,7 +227,7 @@
             <tr>
               <td>${col.id}</td>
               <td>${col.type}</td>
-              <td>${col.value ? col.value : "-"}</td>
+              <td><pre style="white-space: pre-wrap; word-break: break-word;">${col.value ? col.value : "-"}</pre></td>
             </tr>
           `).join("");
 
