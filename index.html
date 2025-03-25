@@ -121,157 +121,25 @@
           responseMessage.className = "message success";
           responseMessage.textContent = `✅ Item created! ID: ${data.id}`;
           document.getElementById("itemName").value = ""; 
-    async function fetchItems() {
-      const container = document.getElementById("itemsContainer");
-      container.innerHTML = "⏳ Loading items...";
-
-      try {
-        const response = await fetch("/.netlify/functions/get-items");
-        const data = await response.json();
-
-        if (Array.isArray(data)) {
-          container.innerHTML = data.map(item => {
-            const rows = item.column_values.map(col => `
-              <tr>
-                <td><strong>${col.column.title}</strong></td>
-                <td>${col.value ? col.value : "-"}</td>
-              </tr>
-            `).join("");
-
-            return `
-              <div style="margin-bottom: 30px; border: 1px solid #ddd; border-radius: 8px; padding: 12px;">
-                <h4>📝 ${item.name}</h4>
-                <p><em>Created: ${new Date(item.created_at).toLocaleDateString()}</em></p>
-                <table style="width:100%; border-collapse: collapse;">
-                  <thead>
-                    <tr><th style="text-align:left; padding: 4px;">Column</th><th style="text-align:left; padding: 4px;">Value</th></tr>
-                  </thead>
-                  <tbody>${rows}</tbody>
-                </table>
-              </div>
-            `;
-          }).join("");
-        } else {
-          container.innerHTML = "⚠️ Failed to load items.";
-        }
-      } catch (e) {
+     catch (e) {
         container.innerHTML = "❌ Error loading items.";
       }
     }
 
     
-    async function fetchItems() {
-      const container = document.getElementById("itemsContainer");
-      container.innerHTML = "⏳ Loading items...";
-
-      try {
-        const response = await fetch("/.netlify/functions/get-items");
-        const data = await response.json();
-
-        if (Array.isArray(data)) {
-          container.innerHTML = data.map(item => {
-            const rows = item.column_values.map(col => `
-              <tr>
-                <td><strong>${col.title}</strong></td>
-                <td>${col.text || "-"}</td>
-              </tr>
-            `).join("");
-
-            return `
-              <div style="margin-bottom: 30px; border: 1px solid #ddd; border-radius: 8px; padding: 12px;">
-                <h4>📝 ${item.name}</h4>
-                <p><em>Created: ${new Date(item.created_at).toLocaleDateString()}</em></p>
-                <table style="width:100%; border-collapse: collapse;">
-                  <thead>
-                    <tr><th style="text-align:left; padding: 4px;">Column</th><th style="text-align:left; padding: 4px;">Value</th></tr>
-                  </thead>
-                  <tbody>${rows}</tbody>
-                </table>
-              </div>
-            `;
-          }).join("");
-        } else {
-          container.innerHTML = "⚠️ Failed to load items.";
-        }
-      } catch (e) {
+     catch (e) {
         container.innerHTML = "❌ Error loading items.";
       }
     }
 
     
-    async function fetchItems() {
-      const container = document.getElementById("itemsContainer");
-      container.innerHTML = "⏳ Loading items...";
-
-      try {
-        const response = await fetch("/.netlify/functions/get-items");
-        const data = await response.json();
-
-        if (Array.isArray(data)) {
-          container.innerHTML = data.map(item => {
-            const rows = item.column_values.map(col => `
-              <tr>
-                <td><strong>${col.title}</strong></td>
-                <td>${col.text || "-"}</td>
-              </tr>
-            `).join("");
-
-            return `
-              <div style="margin-bottom: 30px; border: 1px solid #ddd; border-radius: 8px; padding: 12px;">
-                <h4>📝 ${item.name}</h4>
-                <p><em>Created: ${new Date(item.created_at).toLocaleDateString()}</em></p>
-                <table style="width:100%; border-collapse: collapse;">
-                  <thead>
-                    <tr><th style="text-align:left; padding: 4px;">Column</th><th style="text-align:left; padding: 4px;">Value</th></tr>
-                  </thead>
-                  <tbody>${rows}</tbody>
-                </table>
-              </div>
-            `;
-          }).join("");
-        } else {
-          container.innerHTML = "⚠️ Failed to load items.";
-        }
-      } catch (e) {
+     catch (e) {
         container.innerHTML = "❌ Error loading items.";
       }
     }
 
     
-    async function fetchItems() {
-      const container = document.getElementById("itemsContainer");
-      container.innerHTML = "⏳ Loading items...";
-
-      try {
-        const response = await fetch("/.netlify/functions/get-items");
-        const data = await response.json();
-
-        if (Array.isArray(data)) {
-          container.innerHTML = data.map(item => {
-            const rows = item.column_values.map(col => `
-              <tr>
-                <td><strong>${col.id}</strong></td>
-                <td>${col.type}</td>
-              </tr>
-            `).join("");
-
-            return `
-              <div style="margin-bottom: 30px; border: 1px solid #ddd; border-radius: 8px; padding: 12px;">
-                <h4>📝 ${item.name}</h4>
-                <p><em>Created: ${new Date(item.created_at).toLocaleDateString()}</em></p>
-                <table style="width:100%; border-collapse: collapse;">
-                  <thead>
-                    <tr><th style="text-align:left; padding: 4px;">Column ID</th><th style="text-align:left; padding: 4px;">Type</th></tr>
-                  </thead>
-                  <tbody>${rows}</tbody>
-                </table>
-              </div>
-            `;
-          }).join("");
-        } else {
-          container.innerHTML = "⚠️ Failed to load items.";
-        }
-      } catch (e) {
+     catch (e) {
         container.innerHTML = "❌ Error loading items.";
       }
     }
@@ -292,187 +160,31 @@
       }
     });
   
-    async function fetchItems() {
-      const container = document.getElementById("itemsContainer");
-      container.innerHTML = "⏳ Loading items...";
-
-      try {
-        const response = await fetch("/.netlify/functions/get-items");
-        const data = await response.json();
-
-        if (Array.isArray(data)) {
-          container.innerHTML = data.map(item => {
-            const columns = item.column_values.map(col => 
-              `<div><strong>${col.title}:</strong> ${col.text || "-"}</div>`
-            ).join("");
-            return `
-              <div style="padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 12px;">
-                <div><strong>📝 ${item.name}</strong></div>
-                <div><em>Created: ${new Date(item.created_at).toLocaleDateString()}</em></div>
-                ${columns}
-              </div>
-            `;
-          }).join("");
-        } else {
-          container.innerHTML = "⚠️ Failed to load items.";
-        }
-      } catch (e) {
+     catch (e) {
         container.innerHTML = "❌ Error loading items.";
       }
     }
 
     
-    async function fetchItems() {
-      const container = document.getElementById("itemsContainer");
-      container.innerHTML = "⏳ Loading items...";
-
-      try {
-        const response = await fetch("/.netlify/functions/get-items");
-        const data = await response.json();
-
-        if (Array.isArray(data)) {
-          container.innerHTML = data.map(item => {
-            const rows = item.column_values.map(col => `
-              <tr>
-                <td><strong>${col.column.title}</strong></td>
-                <td>${col.value ? col.value : "-"}</td>
-              </tr>
-            `).join("");
-
-            return `
-              <div style="margin-bottom: 30px; border: 1px solid #ddd; border-radius: 8px; padding: 12px;">
-                <h4>📝 ${item.name}</h4>
-                <p><em>Created: ${new Date(item.created_at).toLocaleDateString()}</em></p>
-                <table style="width:100%; border-collapse: collapse;">
-                  <thead>
-                    <tr><th style="text-align:left; padding: 4px;">Column</th><th style="text-align:left; padding: 4px;">Value</th></tr>
-                  </thead>
-                  <tbody>${rows}</tbody>
-                </table>
-              </div>
-            `;
-          }).join("");
-        } else {
-          container.innerHTML = "⚠️ Failed to load items.";
-        }
-      } catch (e) {
+     catch (e) {
         container.innerHTML = "❌ Error loading items.";
       }
     }
 
     
-    async function fetchItems() {
-      const container = document.getElementById("itemsContainer");
-      container.innerHTML = "⏳ Loading items...";
-
-      try {
-        const response = await fetch("/.netlify/functions/get-items");
-        const data = await response.json();
-
-        if (Array.isArray(data)) {
-          container.innerHTML = data.map(item => {
-            const rows = item.column_values.map(col => `
-              <tr>
-                <td><strong>${col.title}</strong></td>
-                <td>${col.text || "-"}</td>
-              </tr>
-            `).join("");
-
-            return `
-              <div style="margin-bottom: 30px; border: 1px solid #ddd; border-radius: 8px; padding: 12px;">
-                <h4>📝 ${item.name}</h4>
-                <p><em>Created: ${new Date(item.created_at).toLocaleDateString()}</em></p>
-                <table style="width:100%; border-collapse: collapse;">
-                  <thead>
-                    <tr><th style="text-align:left; padding: 4px;">Column</th><th style="text-align:left; padding: 4px;">Value</th></tr>
-                  </thead>
-                  <tbody>${rows}</tbody>
-                </table>
-              </div>
-            `;
-          }).join("");
-        } else {
-          container.innerHTML = "⚠️ Failed to load items.";
-        }
-      } catch (e) {
+     catch (e) {
         container.innerHTML = "❌ Error loading items.";
       }
     }
 
     
-    async function fetchItems() {
-      const container = document.getElementById("itemsContainer");
-      container.innerHTML = "⏳ Loading items...";
-
-      try {
-        const response = await fetch("/.netlify/functions/get-items");
-        const data = await response.json();
-
-        if (Array.isArray(data)) {
-          container.innerHTML = data.map(item => {
-            const rows = item.column_values.map(col => `
-              <tr>
-                <td><strong>${col.title}</strong></td>
-                <td>${col.text || "-"}</td>
-              </tr>
-            `).join("");
-
-            return `
-              <div style="margin-bottom: 30px; border: 1px solid #ddd; border-radius: 8px; padding: 12px;">
-                <h4>📝 ${item.name}</h4>
-                <p><em>Created: ${new Date(item.created_at).toLocaleDateString()}</em></p>
-                <table style="width:100%; border-collapse: collapse;">
-                  <thead>
-                    <tr><th style="text-align:left; padding: 4px;">Column</th><th style="text-align:left; padding: 4px;">Value</th></tr>
-                  </thead>
-                  <tbody>${rows}</tbody>
-                </table>
-              </div>
-            `;
-          }).join("");
-        } else {
-          container.innerHTML = "⚠️ Failed to load items.";
-        }
-      } catch (e) {
+     catch (e) {
         container.innerHTML = "❌ Error loading items.";
       }
     }
 
     
-    async function fetchItems() {
-      const container = document.getElementById("itemsContainer");
-      container.innerHTML = "⏳ Loading items...";
-
-      try {
-        const response = await fetch("/.netlify/functions/get-items");
-        const data = await response.json();
-
-        if (Array.isArray(data)) {
-          container.innerHTML = data.map(item => {
-            const rows = item.column_values.map(col => `
-              <tr>
-                <td><strong>${col.id}</strong></td>
-                <td>${col.type}</td>
-              </tr>
-            `).join("");
-
-            return `
-              <div style="margin-bottom: 30px; border: 1px solid #ddd; border-radius: 8px; padding: 12px;">
-                <h4>📝 ${item.name}</h4>
-                <p><em>Created: ${new Date(item.created_at).toLocaleDateString()}</em></p>
-                <table style="width:100%; border-collapse: collapse;">
-                  <thead>
-                    <tr><th style="text-align:left; padding: 4px;">Column ID</th><th style="text-align:left; padding: 4px;">Type</th></tr>
-                  </thead>
-                  <tbody>${rows}</tbody>
-                </table>
-              </div>
-            `;
-          }).join("");
-        } else {
-          container.innerHTML = "⚠️ Failed to load items.";
-        }
-      } catch (e) {
+     catch (e) {
         container.innerHTML = "❌ Error loading items.";
       }
     }
@@ -484,59 +196,55 @@
 
 
 
-    async function fetchAndRenderItems() {
-      const container = document.getElementById("itemsContainer");
-      container.innerHTML = "⏳ Loading items...";
-
-      try {
-        const response = await fetch("/.netlify/functions/get-items");
-        const data = await response.json();
-
-        if (Array.isArray(data)) {
-          if (data.length === 0) {
-            container.innerHTML = "No items found.";
-            return;
-          }
-
-          const tableHeader = `
-            <thead>
-              <tr>
-                <th>Item Name</th>
-                <th>Created At</th>
-                <th>Column ID</th>
-                <th>Column Type</th>
-              </tr>
-            </thead>
-          `;
-
-          const tableBody = data.map(item => {
-            const rows = item.column_values.map(col => `
-              <tr>
-                <td>${item.name}</td>
-                <td>${new Date(item.created_at).toLocaleDateString()}</td>
-                <td>${col.id}</td>
-                <td>${col.type}</td>
-              </tr>
-            `).join("");
-
-            return rows;
-          }).join("");
-
-          container.innerHTML = `
-            <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-              ${tableHeader}
-              <tbody>${tableBody}</tbody>
-            </table>
-          `;
-        } else {
-          container.innerHTML = "⚠️ Failed to load items.";
-        }
-      } catch (e) {
+     catch (e) {
         container.innerHTML = "❌ Error loading items.";
       }
     }
 
     fetchAndRenderItems();
+
+
+    async function renderGroupedItems() {
+      const container = document.getElementById("itemsContainer");
+      container.innerHTML = "⏳ Loading items...";
+
+      try {
+        const response = await fetch("/.netlify/functions/get-items");
+        const items = await response.json();
+
+        if (!Array.isArray(items)) {
+          container.innerHTML = "⚠️ Failed to load items.";
+          return;
+        }
+
+        container.innerHTML = items.map(item => {
+          const rows = item.column_values.map(col => `
+            <tr>
+              <td>${col.id}</td>
+              <td>${col.type}</td>
+              <td>${col.value ? col.value : "-"}</td>
+            </tr>
+          `).join("");
+
+          return `
+            <div style="margin-bottom: 30px; border: 1px solid #ddd; border-radius: 8px; padding: 12px;">
+              <h4>📝 ${item.name}</h4>
+              <p><em>Created: ${new Date(item.created_at).toLocaleDateString()}</em></p>
+              <table style="width:100%; border-collapse: collapse;">
+                <thead>
+                  <tr><th>Column ID</th><th>Type</th><th>Value</th></tr>
+                </thead>
+                <tbody>${rows}</tbody>
+              </table>
+            </div>
+          `;
+        }).join("");
+      } catch (e) {
+        container.innerHTML = "❌ Error loading items.";
+      }
+    }
+
+    renderGroupedItems();
 
 </script>
 
