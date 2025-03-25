@@ -1,24 +1,17 @@
-const handler = async (event) => {
-  if (event.httpMethod !== "POST") {
-    return {
-      statusCode: 405,
-      body: JSON.stringify({ message: "Method Not Allowed" }),
-    };
-  }
-
-  const { itemName } = JSON.parse(event.body || "{}");
-
-  if (!itemName) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ message: "Missing itemName" }),
-    };
-  }
-
+const handler = async () => {
   const query = `
-    mutation {
-      create_item(board_id: 8773609198, item_name: "${itemName}") {
-        id
+    query {
+      boards(ids: 8773609198) {
+        items {
+          id
+          name
+          created_at
+          column_values {
+            id
+            title
+            text
+          }
+        }
       }
     }
   `;
@@ -38,17 +31,20 @@ const handler = async (event) => {
     if (result.errors) {
       return {
         statusCode: 500,
+        headers: { "Access-Control-Allow-Origin": "*" },
         body: JSON.stringify({ error: result.errors[0].message })
       };
     }
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ id: result.data.create_item.id })
+      headers: { "Access-Control-Allow-Origin": "*" },
+      body: JSON.stringify(result.data.boards[0].items)
     };
   } catch (error) {
     return {
       statusCode: 500,
+      headers: { "Access-Control-Allow-Origin": "*" },
       body: JSON.stringify({ error: error.message })
     };
   }

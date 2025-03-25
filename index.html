@@ -83,6 +83,11 @@
       <button type="button" id="submitButton">Create Item</button>
       <div id="responseMessage" class="message"></div>
     </div>
+<div id="itemsList" style="margin-top: 40px;">
+  <h3 style="text-align:center;">📋 Submitted Items</h3>
+  <div id="itemsContainer" style="margin-top: 10px;"></div>
+</div>
+
   </div>
 
   <script>
@@ -115,7 +120,7 @@
         if (response.ok && data.id) {
           responseMessage.className = "message success";
           responseMessage.textContent = `✅ Item created! ID: ${data.id}`;
-          document.getElementById("itemName").value = "";
+          document.getElementById("itemName").value = ""; fetchItems();
         } else {
           const errorText = data.error || "Unexpected server response.";
           responseMessage.className = "message error";
@@ -126,7 +131,39 @@
         responseMessage.textContent = `❌ Error: ${err.message}`;
       }
     });
-  </script>
+  
+    async function fetchItems() {
+      const container = document.getElementById("itemsContainer");
+      container.innerHTML = "⏳ Loading items...";
+
+      try {
+        const response = await fetch("/.netlify/functions/get-items");
+        const data = await response.json();
+
+        if (Array.isArray(data)) {
+          container.innerHTML = data.map(item => {
+            const columns = item.column_values.map(col => 
+              `<div><strong>${col.title}:</strong> ${col.text || "-"}</div>`
+            ).join("");
+            return `
+              <div style="padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 12px;">
+                <div><strong>📝 ${item.name}</strong></div>
+                <div><em>Created: ${new Date(item.created_at).toLocaleDateString()}</em></div>
+                ${columns}
+              </div>
+            `;
+          }).join("");
+        } else {
+          container.innerHTML = "⚠️ Failed to load items.";
+        }
+      } catch (e) {
+        container.innerHTML = "❌ Error loading items.";
+      }
+    }
+
+    fetchItems();
+
+</script>
 
 </body>
 </html>
