@@ -205,6 +205,42 @@
     renderParsedTable();
 
 
+     catch (e) {
+              // ignore malformed JSON
+            }
+          }
+
+          return `
+            <tr>
+              <td>${item.name}</td>
+              <td>${person}</td>
+              <td>${status}</td>
+              <td>${date}</td>
+            </tr>
+          `;
+        }).join("");
+
+        container.innerHTML = `
+          <table style="width: 100%; border-collapse: collapse; margin-top: 30px;">
+            <thead>
+              <tr style="background: #f0f0f0;">
+                <th style="text-align: left; padding: 8px;">Item Name</th>
+                <th style="text-align: left; padding: 8px;">Person</th>
+                <th style="text-align: left; padding: 8px;">Status</th>
+                <th style="text-align: left; padding: 8px;">Date</th>
+              </tr>
+            </thead>
+            <tbody>${tableRows}</tbody>
+          </table>
+        `;
+      } catch (e) {
+        container.innerHTML = "❌ Error loading items.";
+      }
+    }
+
+    
+
+
     async function renderParsedItemTable() {
       const container = document.getElementById("itemsContainer");
       container.innerHTML = "⏳ Loading items...";
@@ -240,27 +276,30 @@
           }
 
           return `
-            <tr>
-              <td>${item.name}</td>
-              <td>${person}</td>
-              <td>${status}</td>
-              <td>${date}</td>
+            <tr style="border-bottom: 1px solid #eee;">
+              <td style="padding: 12px;">${item.name}</td>
+              <td style="padding: 12px;">${person}</td>
+              <td style="padding: 12px;">${status}</td>
+              <td style="padding: 12px;">${date}</td>
             </tr>
           `;
         }).join("");
 
         container.innerHTML = `
-          <table style="width: 100%; border-collapse: collapse; margin-top: 30px;">
-            <thead>
-              <tr style="background: #f0f0f0;">
-                <th style="text-align: left; padding: 8px;">Item Name</th>
-                <th style="text-align: left; padding: 8px;">Person</th>
-                <th style="text-align: left; padding: 8px;">Status</th>
-                <th style="text-align: left; padding: 8px;">Date</th>
-              </tr>
-            </thead>
-            <tbody>${tableRows}</tbody>
-          </table>
+          <div style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-top: 40px;">
+            <h2 style="margin-top: 0; color: #333; text-align: center;">Submitted Items</h2>
+            <table style="width: 100%; border-collapse: collapse; font-family: 'Segoe UI', sans-serif;">
+              <thead>
+                <tr style="background: #f0f0f0;">
+                  <th style="text-align: left; padding: 12px;">Item Name</th>
+                  <th style="text-align: left; padding: 12px;">Person</th>
+                  <th style="text-align: left; padding: 12px;">Status</th>
+                  <th style="text-align: left; padding: 12px;">Date</th>
+                </tr>
+              </thead>
+              <tbody>${tableRows}</tbody>
+            </table>
+          </div>
         `;
       } catch (e) {
         container.innerHTML = "❌ Error loading items.";
