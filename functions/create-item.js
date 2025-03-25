@@ -1,7 +1,23 @@
 const handler = async (event) => {
+  if (event.httpMethod === "OPTIONS") {
+    // Preflight request for CORS
+    return {
+      statusCode: 200,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type",
+      },
+      body: "OK",
+    };
+  }
+
   if (event.httpMethod !== "POST") {
     return {
       statusCode: 405,
+      headers: {
+        "Access-Control-Allow-Origin": "*"
+      },
       body: JSON.stringify({ message: "Method Not Allowed" }),
     };
   }
@@ -11,6 +27,9 @@ const handler = async (event) => {
   if (!itemName) {
     return {
       statusCode: 400,
+      headers: {
+        "Access-Control-Allow-Origin": "*"
+      },
       body: JSON.stringify({ message: "Missing itemName" }),
     };
   }
@@ -28,9 +47,9 @@ const handler = async (event) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": process.env.MONDAY_API_KEY
+        "Authorization": process.env.MONDAY_API_KEY,
       },
-      body: JSON.stringify({ query })
+      body: JSON.stringify({ query }),
     });
 
     const result = await response.json();
@@ -38,20 +57,30 @@ const handler = async (event) => {
     if (result.errors) {
       return {
         statusCode: 500,
-        body: JSON.stringify({ error: result.errors[0].message })
+        headers: {
+          "Access-Control-Allow-Origin": "*"
+        },
+        body: JSON.stringify({ error: result.errors[0].message }),
       };
     }
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ id: result.data.create_item.id })
+      headers: {
+        "Access-Control-Allow-Origin": "*"
+      },
+      body: JSON.stringify({ id: result.data.create_item.id }),
     };
   } catch (error) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: error.message })
+      headers: {
+        "Access-Control-Allow-Origin": "*"
+      },
+      body: JSON.stringify({ error: error.message }),
     };
   }
 };
 
 export { handler };
+
