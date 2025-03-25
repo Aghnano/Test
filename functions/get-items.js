@@ -2,17 +2,15 @@ const handler = async () => {
   const query = `
     query {
       boards(ids: 8773609198) {
-        items {
-          id
-          name
-          created_at
-          column_values {
+        items_page(limit: 50) {
+          cursor
+          items {
             id
-            type
-            value
-            column {
+            name
+            created_at
+            column_values {
               id
-              title
+              type
             }
           }
         }
@@ -40,10 +38,11 @@ const handler = async () => {
       };
     }
 
+    const items = result.data.boards[0].items_page.items;
     return {
       statusCode: 200,
       headers: { "Access-Control-Allow-Origin": "*" },
-      body: JSON.stringify(result.data.boards[0].items)
+      body: JSON.stringify(items)
     };
   } catch (error) {
     return {
