@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>monday.com Item Creator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: "Segoe UI", sans-serif;
+      background: #f4f7f8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .form-wrapper {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      max-width: 400px;
+      width: 100%;
+    }
+
+    h2 {
+      margin-top: 0;
+      margin-bottom: 15px;
+      color: #333;
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #555;
+      font-weight: 600;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    input[type="submit"] {
+      background-color: #0073ea;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    input[type="submit"]:hover {
+      background-color: #005ec4;
+    }
+
+    .message {
+      margin-top: 10px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .success { color: green; }
+    .error { color: red; }
+  </style>
+</head>
+<body>
+
+  <div class="form-wrapper">
+    <form id="mondayForm">
+      <h2>Create Monday Item</h2>
+      <label for="itemName">Item Name</label>
+      <input type="text" id="itemName" name="itemName" required />
+      <input type="submit" value="Create Item" />
+      <div id="responseMessage" class="message"></div>
+    </form>
+  </div>
+
+  <script>
+    const form = document.getElementById("mondayForm");
+    const responseMessage = document.getElementById("responseMessage");
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      const itemName = document.getElementById("itemName").value;
+
+      const query = `
+        mutation {
+          create_item(board_id: 8773609198, item_name: "${itemName}") {
+            id
+          }
+        }
+      `;
+
+      // Direct fetch to Monday.com API using user's API key
+      fetch("/.netlify/functions/create-item", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "eyJ0aWQiOjMxMzMxMDk2NSwiYWFpIjoxMSwidWlkIjo1MzM4Nzg3NiwiaWFkIjoiMjAyNC0wMS0yM1QxNTo0NTo0NS4wMDBaIiwicGVyIjoibWU6d3JpdGUiLCJhY3RpZCI6MjAzNjA2MzksInJnbiI6InVzZTEifQ"
+        },
+        body: JSON.stringify({ itemName })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.data && data.data.create_item) {
+          const id = data.data.create_item.id;
+          responseMessage.className = "message success";
+          responseMessage.textContent = `✅ Item created! ID: ${id}`;
+          form.reset();
+        } else {
+          throw new Error(data.errors?.[0]?.message || "Unknown error");
+        }
+      })
+      .catch(err => {
+        responseMessage.className = "message error";
+        responseMessage.textContent = `❌ Error: ${err.message}`;
+      });
+
+      // Send postMessage to parent (Power BI) to make API call
+      window.parent.postMessage(
+        {
+          type: "MONDAY_CREATE_ITEM_REQUEST",
+          payload: {
+            query,
+            variables: {}
+          }
+        },
+        "*"
+      );
+    });
+
+    // Handle response from Power BI parent frame
+    window.addEventListener("message", (event) => {
+      const { type, payload } = event.data;
+
+      if (type === "MONDAY_CREATE_ITEM_SUCCESS") {
+        const id = payload?.data?.create_item?.id;
+        responseMessage.className = "message success";
+        responseMessage.textContent = `✅ Item created! ID: ${id}`;
+        form.reset();
+      } else if (type === "MONDAY_CREATE_ITEM_FAILURE") {
+        responseMessage.className = "message error";
+        responseMessage.textContent = `❌ Error: ${payload?.error || "Unknown error"}`;
+      }
+    });
+  </script>
+
+</body>
+</html>
