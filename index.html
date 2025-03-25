@@ -97,45 +97,7 @@
   </div>
 
   <script>
-    async function renderGroupedItems() {
-      const container = document.getElementById("itemsContainer");
-      container.innerHTML = "⏳ Loading items...";
-
-      try {
-        const response = await fetch("/.netlify/functions/get-items");
-        const items = await response.json();
-
-        if (!Array.isArray(items)) {
-          container.innerHTML = "⚠️ Failed to load items.";
-          return;
-        }
-
-        container.innerHTML = items.map(item => {
-          const rows = item.column_values.map(col => `
-            <tr>
-              <td>${col.id}</td>
-              <td>${col.type}</td>
-              <td><pre style="white-space: pre-wrap; word-break: break-word;">${col.value ? col.value : "-"}</pre></td>
-            </tr>
-          `).join("");
-
-          return `
-            <div style="margin-bottom: 30px; border: 1px solid #ddd; border-radius: 8px; padding: 12px;">
-              <h4>📝 ${item.name}</h4>
-              <p><em>Created: ${new Date(item.created_at).toLocaleDateString()}</em></p>
-              <table style="width:100%; border-collapse: collapse;">
-                <thead>
-                  <tr><th>Column ID</th><th>Type</th><th>Value</th></tr>
-                </thead>
-                <tbody>${rows}</tbody>
-              </table>
-            </div>
-          `;
-        }).join("");
-      } catch (e) {
-        container.innerHTML = "❌ Error loading items.";
-      }
-    }
+    
 
     document.getElementById("submitButton").addEventListener("click", async function () {
       const itemName = document.getElementById("itemName").value;
@@ -163,7 +125,7 @@
           responseMessage.className = "message success";
           responseMessage.textContent = `✅ Item created! ID: ${data.id}`;
           document.getElementById("itemName").value = "";
-          renderGroupedItems();
+          
         } else {
           const errorText = data.error || "Unexpected server response.";
           responseMessage.className = "message error";
@@ -175,8 +137,139 @@
       }
     });
 
-    renderGroupedItems();
-  </script>
+    
+  
+    async function renderParsedTable() {
+      const container = document.getElementById("itemsContainer");
+      container.innerHTML = "⏳ Loading items...";
+
+      try {
+        const response = await fetch("/.netlify/functions/get-items");
+        const items = await response.json();
+
+        if (!Array.isArray(items)) {
+          container.innerHTML = "⚠️ Failed to load items.";
+          return;
+        }
+
+        const tableRows = items.map(item => {
+          let status = "-";
+          let person = "-";
+
+          for (const col of item.column_values) {
+            if (col.type === "status") {
+              try {
+                const parsed = JSON.parse(col.value);
+                status = parsed.label || "-";
+              } catch {}
+            }
+
+            if (col.type === "multiple-person") {
+              try {
+                const parsed = JSON.parse(col.value);
+                if (parsed && parsed.personsAndTeams && parsed.personsAndTeams.length > 0) {
+                  person = parsed.personsAndTeams[0].name || "-";
+                }
+              } catch {}
+            }
+          }
+
+          return `
+            <tr>
+              <td>${item.name}</td>
+              <td>${person}</td>
+              <td>${status}</td>
+              <td>${new Date(item.created_at).toLocaleDateString()}</td>
+            </tr>
+          `;
+        }).join("");
+
+        container.innerHTML = `
+          <table style="width:100%; border-collapse: collapse;">
+            <thead>
+              <tr>
+                <th style="text-align:left;">Item Name</th>
+                <th style="text-align:left;">Person</th>
+                <th style="text-align:left;">Status</th>
+                <th style="text-align:left;">Created At</th>
+              </tr>
+            </thead>
+            <tbody>${tableRows}</tbody>
+          </table>
+        `;
+      } catch (e) {
+        container.innerHTML = "❌ Error loading items.";
+      }
+    }
+
+    renderParsedTable();
+
+
+    async function renderParsedItemTable() {
+      const container = document.getElementById("itemsContainer");
+      container.innerHTML = "⏳ Loading items...";
+
+      try {
+        const response = await fetch("/.netlify/functions/get-items");
+        const items = await response.json();
+
+        if (!Array.isArray(items)) {
+          container.innerHTML = "⚠️ Failed to load items.";
+          return;
+        }
+
+        const tableRows = items.map(item => {
+          let person = "-", status = "-", date = "-";
+
+          for (const col of item.column_values) {
+            try {
+              const value = JSON.parse(col.value || "{}");
+
+              if (col.type === "status" && value.label) {
+                status = value.label;
+              }
+              if (col.type === "date" && value.date) {
+                date = value.date;
+              }
+              if (col.type === "multiple-person" && value.personsAndTeams?.length) {
+                person = value.personsAndTeams[0].name;
+              }
+            } catch (e) {
+              // ignore malformed JSON
+            }
+          }
+
+          return `
+            <tr>
+              <td>${item.name}</td>
+              <td>${person}</td>
+              <td>${status}</td>
+              <td>${date}</td>
+            </tr>
+          `;
+        }).join("");
+
+        container.innerHTML = `
+          <table style="width: 100%; border-collapse: collapse; margin-top: 30px;">
+            <thead>
+              <tr style="background: #f0f0f0;">
+                <th style="text-align: left; padding: 8px;">Item Name</th>
+                <th style="text-align: left; padding: 8px;">Person</th>
+                <th style="text-align: left; padding: 8px;">Status</th>
+                <th style="text-align: left; padding: 8px;">Date</th>
+              </tr>
+            </thead>
+            <tbody>${tableRows}</tbody>
+          </table>
+        `;
+      } catch (e) {
+        container.innerHTML = "❌ Error loading items.";
+      }
+    }
+
+    renderParsedItemTable();
+
+</script>
 
 </body>
 </html>
