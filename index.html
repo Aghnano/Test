@@ -48,7 +48,7 @@
       font-size: 16px;
     }
 
-    input[type="submit"] {
+    button {
       background-color: #0073ea;
       color: white;
       padding: 12px;
@@ -59,7 +59,7 @@
       width: 100%;
     }
 
-    input[type="submit"]:hover {
+    button:hover {
       background-color: #005ec4;
     }
 
@@ -76,81 +76,54 @@
 <body>
 
   <div class="form-wrapper">
-    <form id="mondayForm">
+    <div id="mondayForm">
       <h2>Create Monday Item</h2>
       <label for="itemName">Item Name</label>
-      <input type="text" id="itemName" name="itemName" required />
-      <input type="submit" value="Create Item" />
+      <input type="text" id="itemName" required />
+      <button type="button" id="submitButton">Create Item</button>
       <div id="responseMessage" class="message"></div>
-    </form>
+    </div>
   </div>
 
   <script>
-    const form = document.getElementById("mondayForm");
+    // Suppress sandbox-related errors from 3rd-party libraries (if any)
+    try { localStorage.setItem("sandbox-test", "1"); } catch (e) {}
+    try { document.cookie = "test=true"; } catch (e) {}
+
     const responseMessage = document.getElementById("responseMessage");
 
-    form.addEventListener("submit", function (e) {
-      e.preventDefault();
+    document.getElementById("submitButton").addEventListener("click", async function () {
       const itemName = document.getElementById("itemName").value;
+      if (!itemName.trim()) {
+        responseMessage.className = "message error";
+        responseMessage.textContent = "❌ Please enter an item name.";
+        return;
+      }
 
-      const query = `
-        mutation {
-          create_item(board_id: 8773609198, item_name: "${itemName}") {
-            id
-          }
-        }
-      `;
+      responseMessage.className = "message";
+      responseMessage.textContent = "⏳ Creating item...";
 
-      // Direct fetch to Monday.com API using user's API key
-      fetch("/.netlify/functions/create-item", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "eyJ0aWQiOjMxMzMxMDk2NSwiYWFpIjoxMSwidWlkIjo1MzM4Nzg3NiwiaWFkIjoiMjAyNC0wMS0yM1QxNTo0NTo0NS4wMDBaIiwicGVyIjoibWU6d3JpdGUiLCJhY3RpZCI6MjAzNjA2MzksInJnbiI6InVzZTEifQ"
-        },
-        body: JSON.stringify({ itemName })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.data && data.data.create_item) {
-          const id = data.data.create_item.id;
+      try {
+        const response = await fetch("/.netlify/functions/create-item", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ itemName })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.id) {
           responseMessage.className = "message success";
-          responseMessage.textContent = `✅ Item created! ID: ${id}`;
-          form.reset();
+          responseMessage.textContent = `✅ Item created! ID: ${data.id}`;
+          document.getElementById("itemName").value = "";
         } else {
-          throw new Error(data.errors?.[0]?.message || "Unknown error");
+          const errorText = data.error || "Unexpected server response.";
+          responseMessage.className = "message error";
+          responseMessage.textContent = `❌ Error: ${errorText}`;
         }
-      })
-      .catch(err => {
+      } catch (err) {
         responseMessage.className = "message error";
         responseMessage.textContent = `❌ Error: ${err.message}`;
-      });
-
-      // Send postMessage to parent (Power BI) to make API call
-      window.parent.postMessage(
-        {
-          type: "MONDAY_CREATE_ITEM_REQUEST",
-          payload: {
-            query,
-            variables: {}
-          }
-        },
-        "*"
-      );
-    });
-
-    // Handle response from Power BI parent frame
-    window.addEventListener("message", (event) => {
-      const { type, payload } = event.data;
-
-      if (type === "MONDAY_CREATE_ITEM_SUCCESS") {
-        const id = payload?.data?.create_item?.id;
-        responseMessage.className = "message success";
-        responseMessage.textContent = `✅ Item created! ID: ${id}`;
-        form.reset();
-      } else if (type === "MONDAY_CREATE_ITEM_FAILURE") {
-        responseMessage.className = "message error";
-        responseMessage.textContent = `❌ Error: ${payload?.error || "Unknown error"}`;
       }
     });
   </script>
