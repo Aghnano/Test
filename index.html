@@ -276,7 +276,7 @@
       }
     }
 
-    fetchItems();
+    
 
 
 
@@ -477,11 +477,66 @@
       }
     }
 
-    fetchItems();
+    
 
 
 
 
+
+
+    async function fetchAndRenderItems() {
+      const container = document.getElementById("itemsContainer");
+      container.innerHTML = "⏳ Loading items...";
+
+      try {
+        const response = await fetch("/.netlify/functions/get-items");
+        const data = await response.json();
+
+        if (Array.isArray(data)) {
+          if (data.length === 0) {
+            container.innerHTML = "No items found.";
+            return;
+          }
+
+          const tableHeader = `
+            <thead>
+              <tr>
+                <th>Item Name</th>
+                <th>Created At</th>
+                <th>Column ID</th>
+                <th>Column Type</th>
+              </tr>
+            </thead>
+          `;
+
+          const tableBody = data.map(item => {
+            const rows = item.column_values.map(col => `
+              <tr>
+                <td>${item.name}</td>
+                <td>${new Date(item.created_at).toLocaleDateString()}</td>
+                <td>${col.id}</td>
+                <td>${col.type}</td>
+              </tr>
+            `).join("");
+
+            return rows;
+          }).join("");
+
+          container.innerHTML = `
+            <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+              ${tableHeader}
+              <tbody>${tableBody}</tbody>
+            </table>
+          `;
+        } else {
+          container.innerHTML = "⚠️ Failed to load items.";
+        }
+      } catch (e) {
+        container.innerHTML = "❌ Error loading items.";
+      }
+    }
+
+    fetchAndRenderItems();
 
 </script>
 
