@@ -8,8 +8,12 @@ const handler = async () => {
           created_at
           column_values {
             id
-            title
-            text
+            type
+            value
+            column {
+              id
+              title
+            }
           }
         }
       }
