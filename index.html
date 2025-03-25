@@ -12,8 +12,8 @@
       font-family: "Segoe UI", sans-serif;
       background: #f4f7f8;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: center;
     }
 
     .form-wrapper {
@@ -23,6 +23,7 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
       max-width: 400px;
       width: 100%;
+      margin-top: 40px;
     }
 
     h2 {
@@ -71,6 +72,12 @@
 
     .success { color: green; }
     .error { color: red; }
+
+    .items-list {
+      max-width: 800px;
+      width: 100%;
+      margin: 40px;
+    }
   </style>
 </head>
 <body>
@@ -83,132 +90,13 @@
       <button type="button" id="submitButton">Create Item</button>
       <div id="responseMessage" class="message"></div>
     </div>
-<div id="itemsList" style="margin-top: 40px;">
-  <h3 style="text-align:center;">📋 Submitted Items</h3>
-  <div id="itemsContainer" style="margin-top: 10px;"></div>
-</div>
+  </div>
 
+  <div class="items-list">
+    <div id="itemsContainer"></div>
   </div>
 
   <script>
-    // Suppress sandbox-related errors from 3rd-party libraries (if any)
-    try { localStorage.setItem("sandbox-test", "1"); } catch (e) {}
-    try { document.cookie = "test=true"; } catch (e) {}
-
-    const responseMessage = document.getElementById("responseMessage");
-
-    document.getElementById("submitButton").addEventListener("click", async function () {
-      const itemName = document.getElementById("itemName").value;
-      if (!itemName.trim()) {
-        responseMessage.className = "message error";
-        responseMessage.textContent = "❌ Please enter an item name.";
-        return;
-      }
-
-      responseMessage.className = "message";
-      responseMessage.textContent = "⏳ Creating item...";
-
-      try {
-        const response = await fetch("/.netlify/functions/create-item", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ itemName })
-        });
-
-        const data = await response.json();
-
-        if (response.ok && data.id) {
-          responseMessage.className = "message success";
-          responseMessage.textContent = `✅ Item created! ID: ${data.id}`;
-          document.getElementById("itemName").value = ""; 
-     catch (e) {
-        container.innerHTML = "❌ Error loading items.";
-      }
-    }
-
-    
-     catch (e) {
-        container.innerHTML = "❌ Error loading items.";
-      }
-    }
-
-    
-     catch (e) {
-        container.innerHTML = "❌ Error loading items.";
-      }
-    }
-
-    
-     catch (e) {
-        container.innerHTML = "❌ Error loading items.";
-      }
-    }
-
-    
-
-
-
-
-        } else {
-          const errorText = data.error || "Unexpected server response.";
-          responseMessage.className = "message error";
-          responseMessage.textContent = `❌ Error: ${errorText}`;
-        }
-      } catch (err) {
-        responseMessage.className = "message error";
-        responseMessage.textContent = `❌ Error: ${err.message}`;
-      }
-    });
-  
-     catch (e) {
-        container.innerHTML = "❌ Error loading items.";
-      }
-    }
-
-    
-     catch (e) {
-        container.innerHTML = "❌ Error loading items.";
-      }
-    }
-
-    
-     catch (e) {
-        container.innerHTML = "❌ Error loading items.";
-      }
-    }
-
-    
-     catch (e) {
-        container.innerHTML = "❌ Error loading items.";
-      }
-    }
-
-    
-     catch (e) {
-        container.innerHTML = "❌ Error loading items.";
-      }
-    }
-
-    
-
-
-
-
-
-
-     catch (e) {
-        container.innerHTML = "❌ Error loading items.";
-      }
-    }
-
-    fetchAndRenderItems();
-
-
-    
-
-    
-
-
     async function renderGroupedItems() {
       const container = document.getElementById("itemsContainer");
       container.innerHTML = "⏳ Loading items...";
@@ -249,9 +137,46 @@
       }
     }
 
-    renderGroupedItems();
+    document.getElementById("submitButton").addEventListener("click", async function () {
+      const itemName = document.getElementById("itemName").value;
+      const responseMessage = document.getElementById("responseMessage");
 
-</script>
+      if (!itemName.trim()) {
+        responseMessage.className = "message error";
+        responseMessage.textContent = "❌ Please enter an item name.";
+        return;
+      }
+
+      responseMessage.className = "message";
+      responseMessage.textContent = "⏳ Creating item...";
+
+      try {
+        const response = await fetch("/.netlify/functions/create-item", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ itemName })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.id) {
+          responseMessage.className = "message success";
+          responseMessage.textContent = `✅ Item created! ID: ${data.id}`;
+          document.getElementById("itemName").value = "";
+          renderGroupedItems();
+        } else {
+          const errorText = data.error || "Unexpected server response.";
+          responseMessage.className = "message error";
+          responseMessage.textContent = `❌ Error: ${errorText}`;
+        }
+      } catch (err) {
+        responseMessage.className = "message error";
+        responseMessage.textContent = `❌ Error: ${err.message}`;
+      }
+    });
+
+    renderGroupedItems();
+  </script>
 
 </body>
 </html>

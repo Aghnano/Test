@@ -11,6 +11,7 @@ const handler = async () => {
             column_values {
               id
               type
+              value
             }
           }
         }
@@ -29,16 +30,8 @@ const handler = async () => {
     });
 
     const result = await response.json();
-
-    if (result.errors) {
-      return {
-        statusCode: 500,
-        headers: { "Access-Control-Allow-Origin": "*" },
-        body: JSON.stringify({ error: result.errors[0].message })
-      };
-    }
-
     const items = result.data.boards[0].items_page.items;
+
     return {
       statusCode: 200,
       headers: { "Access-Control-Allow-Origin": "*" },
