@@ -12,6 +12,9 @@ const handler = async () => {
               id
               type
               value
+              ... on StatusValue {
+                label
+              }
             }
           }
         }
