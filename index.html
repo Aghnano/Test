@@ -64,7 +64,6 @@
           return `
             <tr>
               <td style="padding: 12px;">${item.name}</td>
-              <td style="padding: 12px;">${person}</td>
               <td style="padding: 12px;">${statusBadge(status)}</td>
               <td style="padding: 12px;">${date}</td>
             </tr>
@@ -78,7 +77,6 @@
               <thead>
                 <tr style="background:#f9f9f9; border-bottom: 2px solid #ddd;">
                   <th style="text-align:left; padding:12px;">Item Name</th>
-                  <th style="text-align:left; padding:12px;">Person</th>
                   <th style="text-align:left; padding:12px;">Status</th>
                   <th style="text-align:left; padding:12px;">Date</th>
                 </tr>
@@ -164,10 +162,7 @@
               status = col.label;
             }
 
-            if (col.id === "person" && col.text) {
-              person = col.text;
-            }
-
+            
             if (col.id === "date4") {
               try {
                 const value = JSON.parse(col.value || "{}");
@@ -179,7 +174,6 @@
           return `
             <tr>
               <td style="padding: 12px;">${item.name}</td>
-              <td style="padding: 12px;">${person}</td>
               <td style="padding: 12px;">${statusBadge(status)}</td>
               <td style="padding: 12px;">${date}</td>
             </tr>
@@ -193,7 +187,6 @@
               <thead>
                 <tr style="background:#f9f9f9;">
                   <th style="text-align:left; padding:12px;">Item Name</th>
-                  <th style="text-align:left; padding:12px;">Person</th>
                   <th style="text-align:left; padding:12px;">Status</th>
                   <th style="text-align:left; padding:12px;">Date</th>
                 </tr>
