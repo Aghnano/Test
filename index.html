@@ -97,235 +97,15 @@
   </div>
 
   <script>
-     catch (e) {}
-          }
-
-          return `
-            <tr style="border-bottom: 1px solid #eee;">
-              <td style="padding: 12px;">${item.name}</td>
-              <td style="padding: 12px;">${person}</td>
-              <td style="padding: 12px;">${status}</td>
-              <td style="padding: 12px;">${date}</td>
-            </tr>
-          `;
-        }).join("");
-
-        container.innerHTML = `
-          <div style="background: white; padding: 24px 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-top: 40px;">
-            <h2 style="margin-top: 0; color: #222; text-align: center; font-weight: 600;">Submitted Items</h2>
-            <table style="width: 100%; border-collapse: collapse; font-family: 'Segoe UI', sans-serif; font-size: 15px;">
-              <thead>
-                <tr style="background: #f9f9f9; border-bottom: 2px solid #ddd;">
-                  <th style="text-align: left; padding: 12px;">Item Name</th>
-                  <th style="text-align: left; padding: 12px;">Person</th>
-                  <th style="text-align: left; padding: 12px;">Status</th>
-                  <th style="text-align: left; padding: 12px;">Date</th>
-                </tr>
-              </thead>
-              <tbody>${tableRows}</tbody>
-            </table>
-          </div>
-        `;
-      } catch (e) {
-        container.innerHTML = "❌ Error loading items.";
-      }
+    function statusBadge(status) {
+      const colors = {
+        "Done": "#00c875",
+        "Working on it": "#fdab3d",
+        "Stuck": "#e2445c"
+      };
+      const color = colors[status] || "#ccc";
+      return `<span style="background:${color}; color:white; padding:4px 10px; border-radius:12px; font-size: 13px;">${status}</span>`;
     }
-
-    document.getElementById("submitButton").addEventListener("click", async function () {
-      const itemName = document.getElementById("itemName").value;
-      const responseMessage = document.getElementById("responseMessage");
-
-      if (!itemName.trim()) {
-        responseMessage.className = "message error";
-        responseMessage.textContent = "❌ Please enter an item name.";
-        return;
-      }
-
-      responseMessage.className = "message";
-      responseMessage.textContent = "⏳ Creating item...";
-
-      try {
-        const response = await fetch("/.netlify/functions/create-item", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ itemName })
-        });
-
-        const data = await response.json();
-
-        if (response.ok && data.id) {
-          responseMessage.className = "message success";
-          responseMessage.textContent = `✅ Item created! ID: ${data.id}`;
-          document.getElementById("itemName").value = "";
-          
-        } else {
-          const errorText = data.error || "Unexpected server response.";
-          responseMessage.className = "message error";
-          responseMessage.textContent = `❌ Error: ${errorText}`;
-        }
-      } catch (err) {
-        responseMessage.className = "message error";
-        responseMessage.textContent = `❌ Error: ${err.message}`;
-      }
-    });
-
-    
-  
-    
-            } catch (e) {
-              // silently ignore bad JSON
-            }
-          }
-
-          return `
-            <tr style="border-bottom: 1px solid #eee;">
-              <td style="padding: 12px;">${item.name}</td>
-              <td style="padding: 12px;">${person}</td>
-              <td style="padding: 12px;">${status}</td>
-              <td style="padding: 12px;">${date}</td>
-            </tr>
-          `;
-        }).join("");
-
-        container.innerHTML = `
-          <div style="background: white; padding: 24px 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-top: 40px;">
-            <h2 style="margin-top: 0; color: #222; text-align: center; font-weight: 600;">Submitted Items</h2>
-            <table style="width: 100%; border-collapse: collapse; font-family: 'Segoe UI', sans-serif; font-size: 15px;">
-              <thead>
-                <tr style="background: #f9f9f9; border-bottom: 2px solid #ddd;">
-                  <th style="text-align: left; padding: 12px;">Item Name</th>
-                  <th style="text-align: left; padding: 12px;">Person</th>
-                  <th style="text-align: left; padding: 12px;">Status</th>
-                  <th style="text-align: left; padding: 12px;">Date</th>
-                </tr>
-              </thead>
-              <tbody>${tableRows}</tbody>
-            </table>
-          </div>
-        `;
-      } catch (e) {
-        container.innerHTML = "❌ Error loading items.";
-      }
-    }
-
-    document.getElementById("submitButton").addEventListener("click", async function () {
-      const itemName = document.getElementById("itemName").value;
-      const responseMessage = document.getElementById("responseMessage");
-
-      if (!itemName.trim()) {
-        responseMessage.className = "message error";
-        responseMessage.textContent = "❌ Please enter an item name.";
-        return;
-      }
-
-      responseMessage.className = "message";
-      responseMessage.textContent = "⏳ Creating item...";
-
-      try {
-        const response = await fetch("/.netlify/functions/create-item", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ itemName })
-        });
-
-        const data = await response.json();
-
-        if (response.ok && data.id) {
-          responseMessage.className = "message success";
-          responseMessage.textContent = `✅ Item created! ID: ${data.id}`;
-          document.getElementById("itemName").value = "";
-          
-        } else {
-          const errorText = data.error || "Unexpected server response.";
-          responseMessage.className = "message error";
-          responseMessage.textContent = `❌ Error: ${errorText}`;
-        }
-      } catch (err) {
-        responseMessage.className = "message error";
-        responseMessage.textContent = `❌ Error: ${err.message}`;
-      }
-    });
-
-    
-
-
-    
-            } catch (e) {
-              // ignore JSON parse error
-            }
-          }
-
-          return `
-            <tr style="border-bottom: 1px solid #eee;">
-              <td style="padding: 12px;">${item.name}</td>
-              <td style="padding: 12px;">${person}</td>
-              <td style="padding: 12px;">${statusBadge(status)}</td>
-              <td style="padding: 12px;">${date}</td>
-            </tr>
-          `;
-        }).join("");
-
-        container.innerHTML = `
-          <div style="background: white; padding: 24px 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-top: 40px;">
-            <h2 style="margin-top: 0; color: #222; text-align: center; font-weight: 600;">Submitted Items</h2>
-            <table style="width: 100%; border-collapse: collapse; font-family: 'Segoe UI', sans-serif; font-size: 15px;">
-              <thead>
-                <tr style="background: #f9f9f9; border-bottom: 2px solid #ddd;">
-                  <th style="text-align: left; padding: 12px;">Item Name</th>
-                  <th style="text-align: left; padding: 12px;">Person</th>
-                  <th style="text-align: left; padding: 12px;">Status</th>
-                  <th style="text-align: left; padding: 12px;">Date</th>
-                </tr>
-              </thead>
-              <tbody>${tableRows}</tbody>
-            </table>
-          </div>
-        `;
-      } catch (e) {
-        container.innerHTML = "❌ Error loading items.";
-      }
-    }
-
-    document.getElementById("submitButton").addEventListener("click", async function () {
-      const itemName = document.getElementById("itemName").value;
-      const responseMessage = document.getElementById("responseMessage");
-
-      if (!itemName.trim()) {
-        responseMessage.className = "message error";
-        responseMessage.textContent = "❌ Please enter an item name.";
-        return;
-      }
-
-      responseMessage.className = "message";
-      responseMessage.textContent = "⏳ Creating item...";
-
-      try {
-        const response = await fetch("/.netlify/functions/create-item", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ itemName })
-        });
-
-        const data = await response.json();
-
-        if (response.ok && data.id) {
-          responseMessage.className = "message success";
-          responseMessage.textContent = `✅ Item created! ID: ${data.id}`;
-          document.getElementById("itemName").value = "";
-          
-        } else {
-          const errorText = data.error || "Unexpected server response.";
-          responseMessage.className = "message error";
-          responseMessage.textContent = `❌ Error: ${errorText}`;
-        }
-      } catch (err) {
-        responseMessage.className = "message error";
-        responseMessage.textContent = `❌ Error: ${err.message}`;
-      }
-    });
-
-    
-
 
     async function renderParsedItemTable() {
       const container = document.getElementById("itemsContainer");
@@ -340,40 +120,23 @@
           return;
         }
 
-        const statusBadge = (status) => {
-          const map = {
-            "Done": "#00c875",
-            "Working on it": "#fdab3d",
-            "Stuck": "#e2445c"
-          };
-          const color = map[status] || "#cccccc";
-          return `<span style="background:${color}; color:white; padding:4px 10px; border-radius:12px; font-size: 13px;">${status}</span>`;
-        };
-
-        const tableRows = items.map(item => {
+        const rows = items.map(item => {
           let person = "-", status = "-", date = "-";
 
           for (const col of item.column_values) {
             try {
               const value = JSON.parse(col.value || "{}");
-
-              if (col.type === "status" && value?.label) {
-                status = value.label;
-              } else if (col.type === "date" && value?.date) {
-                date = value.date;
-              } else if (col.type === "multiple-person" && Array.isArray(value?.personsAndTeams)) {
-                const firstPerson = value.personsAndTeams.find(p => p.name);
-                if (firstPerson) {
-                  person = firstPerson.name;
-                }
+              if (col.type === "status" && value.label) status = value.label;
+              if (col.type === "date" && value.date) date = value.date;
+              if (col.type === "multiple-person" && value.personsAndTeams?.length) {
+                const first = value.personsAndTeams.find(p => p.name);
+                if (first) person = first.name;
               }
-            } catch (err) {
-              // ignore
-            }
+            } catch {}
           }
 
           return `
-            <tr style="border-bottom: 1px solid #eee;">
+            <tr>
               <td style="padding: 12px;">${item.name}</td>
               <td style="padding: 12px;">${person}</td>
               <td style="padding: 12px;">${statusBadge(status)}</td>
@@ -383,27 +146,27 @@
         }).join("");
 
         container.innerHTML = `
-          <div style="background: white; padding: 24px 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-top: 40px;">
-            <h2 style="margin-top: 0; color: #222; text-align: center; font-weight: 600;">Submitted Items</h2>
-            <table style="width: 100%; border-collapse: collapse; font-family: 'Segoe UI', sans-serif; font-size: 15px;">
+          <div style="background:white; padding:30px; border-radius:8px; box-shadow:0 4px 10px rgba(0,0,0,0.05);">
+            <h2 style="text-align:center; margin-top:0;">Submitted Items</h2>
+            <table style="width:100%; border-collapse: collapse; font-size:15px;">
               <thead>
-                <tr style="background: #f9f9f9; border-bottom: 2px solid #ddd;">
-                  <th style="text-align: left; padding: 12px;">Item Name</th>
-                  <th style="text-align: left; padding: 12px;">Person</th>
-                  <th style="text-align: left; padding: 12px;">Status</th>
-                  <th style="text-align: left; padding: 12px;">Date</th>
+                <tr style="background:#f9f9f9; border-bottom:2px solid #ddd;">
+                  <th style="text-align:left; padding:12px;">Item Name</th>
+                  <th style="text-align:left; padding:12px;">Person</th>
+                  <th style="text-align:left; padding:12px;">Status</th>
+                  <th style="text-align:left; padding:12px;">Date</th>
                 </tr>
               </thead>
-              <tbody>${tableRows}</tbody>
+              <tbody>${rows}</tbody>
             </table>
           </div>
         `;
-      } catch (e) {
+      } catch {
         container.innerHTML = "❌ Error loading items.";
       }
     }
 
-    document.getElementById("submitButton").addEventListener("click", async function () {
+    document.getElementById("submitButton").addEventListener("click", async () => {
       const itemName = document.getElementById("itemName").value;
       const responseMessage = document.getElementById("responseMessage");
 
@@ -431,9 +194,8 @@
           document.getElementById("itemName").value = "";
           renderParsedItemTable();
         } else {
-          const errorText = data.error || "Unexpected server response.";
           responseMessage.className = "message error";
-          responseMessage.textContent = `❌ Error: ${errorText}`;
+          responseMessage.textContent = `❌ Error: ${data.error || "Unknown error"}`;
         }
       } catch (err) {
         responseMessage.className = "message error";
@@ -442,8 +204,7 @@
     });
 
     renderParsedItemTable();
-
-</script>
+  </script>
 
 </body>
 </html>
