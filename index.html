@@ -78,6 +78,16 @@
             if (col.id === "status" && col.label) {
               status = col.label;
             }
+            if (col.id === "person" && col.text) {
+              person = col.text;
+            }
+            if (col.id === "date4") {
+              try {
+                const value = JSON.parse(col.value || "{}");
+                if (value.date) date = value.date;
+              } catch (e) {}
+            }
+          }
 
             if (col.id === "date4") {
               const value = JSON.parse(col.value || "{}");
