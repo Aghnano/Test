@@ -15,9 +15,6 @@ const handler = async () => {
               ... on StatusValue {
                 label
               }
-              ... on PeopleValue {
-                text
-              }
             }
           }
         }
