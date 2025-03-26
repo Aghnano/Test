@@ -84,8 +84,7 @@
               if (value.date) date = value.date;
             }
 
-            if (col.id === "person") {
-              const value = JSON.parse(col.value || "{}");
+            if (col.id === "person" && col.text) { person = col.text; }");
               if (Array.isArray(value.personsAndTeams)) {
                 const first = value.personsAndTeams.find(p => p.name);
                 if (first) person = first.name;
