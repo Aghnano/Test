@@ -85,7 +85,15 @@
       function renderTable(items) {
         const root = document.getElementById('table-root');
         const rows = items.map(item => {
-          const textVal = item.column_values.find(col => col.id === 'text_mkptfrq1')?.text || '';
+          
+    let textVal = "";
+    try {
+      const raw = item.column_values.find(col => col.id === 'text_mkptfrq1')?.value;
+      textVal = JSON.parse(raw || '""');
+    } catch (e) {
+      textVal = "";
+    }
+    
           const statusObj = item.column_values.find(col => col.id === 'status');
           const status = statusObj?.label || '';
           const badgeColor = statusColors[status] || '#ccc';
