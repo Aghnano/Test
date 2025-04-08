@@ -16,7 +16,7 @@ const handler = async (event) => {
 
     const mutation = `
       mutation {
-        change_column_value(item_id: ${itemId}, board_id: 8773609198, column_id: "${columnId}", value: "${value.replace(/"/g, '\"')}") {
+        change_column_value(item_id: ${itemId}, board_id: 8773609198, column_id: "${columnId}", value: ${JSON.stringify(value)}) {
           id
         }
       }
