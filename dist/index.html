@@ -44,7 +44,10 @@
             });
 
             
-    fetchItems().then(renderTable);
+    (async () => {
+  const items = await fetchItems();
+  renderTable(items);
+})();
      // reload the table
           }
         };
@@ -106,7 +109,10 @@ document.addEventListener("DOMContentLoaded", () => {
         })
       });
 
-      fetchItems().then(renderTable);
+      (async () => {
+  const items = await fetchItems();
+  renderTable(items);
+})();
     }
   };
 });
@@ -276,7 +282,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 })
               });
 
-              fetchItems().then(renderTable);
+              (async () => {
+  const items = await fetchItems();
+  renderTable(items);
+})();
             }
           };
         }
