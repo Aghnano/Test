@@ -33,7 +33,7 @@
       function renderTable(items) {
         const root = document.getElementById('table-root');
         const rows = items.map(item => {
-          const textVal = item.column_values.find(col => col.id === 'comment')?.text || '';
+          const textVal = item.column_values.find(col => col.id === 'text_mkptfrq1')?.text || '';
           const statusObj = item.column_values.find(col => col.id === 'status');
           const status = statusObj?.label || '';
           const badgeColor = statusColors[status] || '#ccc';
@@ -41,7 +41,7 @@
           return `
             <tr data-id="${item.id}">
               <td>${item.name}</td>
-              <td><input value="${textVal}" data-col="comment"/></td>
+              <td><input value="${textVal}" data-col="text_mkptfrq1"/></td>
               <td>
                 <select data-col="status">
                   <option value="">Select</option>
@@ -68,14 +68,14 @@
           btn.onclick = async () => {
             const row = btn.closest('tr');
             const id = row.dataset.id;
-            const text = row.querySelector('input[data-col="comment"]').value;
+            const text = row.querySelector('input[data-col="text_mkptfrq1"]').value;
             const status = row.querySelector('select[data-col="status"]').value;
 
             const updates = [
               fetch('/.netlify/functions/update-item', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ itemId: id, columnId: 'comment', value: JSON.stringify(text) })
+                body: JSON.stringify({ itemId: id, columnId: 'text_mkptfrq1', value: JSON.stringify(text) })
               }),
               fetch('/.netlify/functions/update-item', {
                 method: 'POST',
