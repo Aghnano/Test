@@ -5,118 +5,153 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Editable Monday Table</title>
     <script type="module">
-      const statusColors = {
-        "Done": "#00c875",
-        "Working on it": "#fdab3d",
-        "Stuck": "#e2445c"
+  async function fetchItems() {
+    const res = await fetch('/.netlify/functions/get-items');
+    return await res.json();
+  }
+
+  function renderTable(items) {
+    const root = document.getElementById('table-root');
+    const rows = items.map(item => {
+      let comment = "";
+      try {
+        const raw = item.column_values.find(col => col.id === 'text_mkptfrq1')?.value;
+        comment = JSON.parse(raw || '""');
+      } catch {}
+
+      const status = item.column_values.find(col => col.id === 'status')?.label || '';
+
+      return `
+        <tr data-id="${item.id}">
+          <td>${item.name}</td>
+          <td><input value="${comment}" data-col="text_mkptfrq1" /></td>
+          <td>
+            <select data-col="status">
+              <option value="">Select</option>
+              <option ${status === 'Working on it' ? 'selected' : ''}>Working on it</option>
+              <option ${status === 'Done' ? 'selected' : ''}>Done</option>
+              <option ${status === 'Stuck' ? 'selected' : ''}>Stuck</option>
+            </select>
+          </td>
+          <td><button class="btn">Save</button></td>
+        </tr>
+      `;
+    }).join("");
+
+    const newRow = `
+      <tr id="new-item-row">
+        <td><input id="new-item-name" placeholder="Item name..." /></td>
+        <td><input id="new-item-comment" placeholder="Comment..." /></td>
+        <td>
+          <select id="new-item-status">
+            <option value="">Select</option>
+            <option value="Working on it">Working on it</option>
+            <option value="Done">Done</option>
+            <option value="Stuck">Stuck</option>
+          </select>
+        </td>
+        <td><button id="create-button" class="btn">Create</button></td>
+      </tr>
+    `;
+
+    root.innerHTML = `
+      <table>
+        <thead><tr><th>Item</th><th>Comment</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>${rows}${newRow}</tbody>
+      </table>
+    `;
+
+    // Bind save buttons
+    document.querySelectorAll('button.btn').forEach(btn => {
+      const row = btn.closest('tr');
+      const id = row?.dataset?.id;
+      if (!id) return;
+
+      btn.onclick = async () => {
+        const input = row.querySelector('input[data-col="text_mkptfrq1"]');
+        const select = row.querySelector('select[data-col="status"]');
+        if (!input || !select) return;
+
+        const comment = input.value;
+        const status = select.value;
+
+        await fetch('/.netlify/functions/update-item', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            itemId: id,
+            columnId: 'text_mkptfrq1',
+            value: JSON.stringify(comment)
+          })
+        });
+
+        await fetch('/.netlify/functions/update-item', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            itemId: id,
+            columnId: 'status',
+            value: JSON.stringify({ label: status })
+          })
+        });
+
+        btn.textContent = '✓ Saved';
+        setTimeout(() => btn.textContent = 'Save', 1500);
       };
-    
-        
-
-          const res = await fetch('/.netlify/functions/create-item', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(mutation)
-          });
-
-          const { id } = (await res.json())?.response?.data?.create_item || {};
-
-          if (id) {
-            // Now update the two columns
-            await fetch('/.netlify/functions/update-item', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                itemId: id,
-                columnId: 'text_mkptfrq1',
-                value: JSON.stringify(comment)
-              })
-            });
-
-            await fetch('/.netlify/functions/update-item', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                itemId: id,
-                columnId: 'status',
-                value: JSON.stringify({ label: status })
-              })
-            });
-
-            
-    (async () => {
-  const items = await fetchItems();
-  renderTable(items);
-})();
-     // reload the table
-          }
-        };
-
-
-document.addEventListener("DOMContentLoaded", () => {
-  const createBtn = document.getElementById("create-button");
-  if (!createBtn) return;
-
-  createBtn.onclick = async () => {
-    const nameEl = document.getElementById("new-item-name");
-    const commentEl = document.getElementById("new-item-comment");
-    const statusEl = document.getElementById("new-item-status");
-
-    if (!nameEl || !commentEl || !statusEl) {
-      console.error("Missing input elements");
-      return;
-    }
-
-    const name = nameEl.value.trim();
-    const comment = commentEl.value.trim();
-    const status = statusEl.value;
-
-    if (!name) return;
-
-    const res = await fetch('/.netlify/functions/create-item', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        query: `mutation {
-          create_item(board_id: 8773609198, item_name: "${name}") {
-            id
-          }
-        }`
-      })
     });
 
-    const result = await res.json();
-    const id = result?.response?.create_item?.id;
+    // Bind create button
+    const createBtn = document.getElementById('create-button');
+    if (createBtn) {
+      createBtn.onclick = async () => {
+        const name = document.getElementById('new-item-name')?.value.trim();
+        const comment = document.getElementById('new-item-comment')?.value.trim();
+        const status = document.getElementById('new-item-status')?.value;
 
-    if (id) {
-      await fetch('/.netlify/functions/update-item', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          itemId: id,
-          columnId: 'text_mkptfrq1',
-          value: JSON.stringify(comment)
-        })
-      });
+        if (!name) return;
 
-      await fetch('/.netlify/functions/update-item', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          itemId: id,
-          columnId: 'status',
-          value: JSON.stringify({ label: status })
-        })
-      });
+        const res = await fetch('/.netlify/functions/create-item', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            query: `mutation {
+              create_item(board_id: 8773609198, item_name: "${name}") {
+                id
+              }
+            }`
+          })
+        });
 
-      (async () => {
-  const items = await fetchItems();
-  renderTable(items);
-})();
+        const result = await res.json();
+        const id = result?.response?.create_item?.id;
+        if (!id) return;
+
+        await fetch('/.netlify/functions/update-item', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            itemId: id,
+            columnId: 'text_mkptfrq1',
+            value: JSON.stringify(comment)
+          })
+        });
+
+        await fetch('/.netlify/functions/update-item', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            itemId: id,
+            columnId: 'status',
+            value: JSON.stringify({ label: status })
+          })
+        });
+
+        fetchItems().then(renderTable);
+      };
     }
-  };
-});
+  }
 
+  fetchItems().then(renderTable);
 </script>
     <style>
       body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #f9fafb; padding: 2rem; }
@@ -131,164 +166,154 @@ document.addEventListener("DOMContentLoaded", () => {
   <body>
     <h2 style="margin-bottom: 1rem;">Editable Monday Table</h2>
     <div id="table-root">Loading...</div>
-    <script>
-      async function fetchItems() {
-        const res = await fetch('/.netlify/functions/get-items');
-        return await res.json();
-      }
+    <script type="module">
+  async function fetchItems() {
+    const res = await fetch('/.netlify/functions/get-items');
+    return await res.json();
+  }
 
-      
-      function renderTable(items) {
-        const root = document.getElementById('table-root');
-        const rows = items.map(item => {
-          let textVal = "";
-          try {
-            const raw = item.column_values.find(col => col.id === 'text_mkptfrq1')?.value;
-            textVal = JSON.parse(raw || '""');
-          } catch (e) {}
+  function renderTable(items) {
+    const root = document.getElementById('table-root');
+    const rows = items.map(item => {
+      let comment = "";
+      try {
+        const raw = item.column_values.find(col => col.id === 'text_mkptfrq1')?.value;
+        comment = JSON.parse(raw || '""');
+      } catch {}
 
-          const statusObj = item.column_values.find(col => col.id === 'status');
-          const status = statusObj?.label || '';
+      const status = item.column_values.find(col => col.id === 'status')?.label || '';
 
-          return `
-            <tr data-id="${item.id}">
-              <td>${item.name}</td>
-              <td><input value="${textVal}" data-col="text_mkptfrq1" /></td>
-              <td>
-                <select data-col="status">
-                  <option value="">Select</option>
-                  <option ${status === 'Working on it' ? 'selected' : ''}>Working on it</option>
-                  <option ${status === 'Done' ? 'selected' : ''}>Done</option>
-                  <option ${status === 'Stuck' ? 'selected' : ''}>Stuck</option>
-                </select>
-              </td>
-              <td><button class="btn">Save</button></td>
-            </tr>
-          `;
-        }).join("");
+      return `
+        <tr data-id="${item.id}">
+          <td>${item.name}</td>
+          <td><input value="${comment}" data-col="text_mkptfrq1" /></td>
+          <td>
+            <select data-col="status">
+              <option value="">Select</option>
+              <option ${status === 'Working on it' ? 'selected' : ''}>Working on it</option>
+              <option ${status === 'Done' ? 'selected' : ''}>Done</option>
+              <option ${status === 'Stuck' ? 'selected' : ''}>Stuck</option>
+            </select>
+          </td>
+          <td><button class="btn">Save</button></td>
+        </tr>
+      `;
+    }).join("");
 
-        const newRow = `
-          <tr id="new-item-row">
-            <td><input id="new-item-name" placeholder="Item name..." /></td>
-            <td><input id="new-item-comment" placeholder="Comment..." /></td>
-            <td>
-              <select id="new-item-status">
-                <option value="">Select</option>
-                <option value="Working on it">Working on it</option>
-                <option value="Done">Done</option>
-                <option value="Stuck">Stuck</option>
-              </select>
-            </td>
-            <td><button id="create-button" class="btn">Create</button></td>
-          </tr>
-        `;
+    const newRow = `
+      <tr id="new-item-row">
+        <td><input id="new-item-name" placeholder="Item name..." /></td>
+        <td><input id="new-item-comment" placeholder="Comment..." /></td>
+        <td>
+          <select id="new-item-status">
+            <option value="">Select</option>
+            <option value="Working on it">Working on it</option>
+            <option value="Done">Done</option>
+            <option value="Stuck">Stuck</option>
+          </select>
+        </td>
+        <td><button id="create-button" class="btn">Create</button></td>
+      </tr>
+    `;
 
-        root.innerHTML = `
-          <table>
-            <thead>
-              <tr><th>Item</th><th>Comment</th><th>Status</th><th>Actions</th></tr>
-            </thead>
-            <tbody>${rows}${newRow}</tbody>
-          </table>
-        `;
+    root.innerHTML = `
+      <table>
+        <thead><tr><th>Item</th><th>Comment</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>${rows}${newRow}</tbody>
+      </table>
+    `;
 
-        document.querySelectorAll('button.btn').forEach(btn => {
-          btn.onclick = async () => {
-            const row = btn.closest('tr');
-            const id = row?.dataset?.id;
+    // Bind save buttons
+    document.querySelectorAll('button.btn').forEach(btn => {
+      const row = btn.closest('tr');
+      const id = row?.dataset?.id;
+      if (!id) return;
 
-            if (!id) return;
+      btn.onclick = async () => {
+        const input = row.querySelector('input[data-col="text_mkptfrq1"]');
+        const select = row.querySelector('select[data-col="status"]');
+        if (!input || !select) return;
 
-            const input = row.querySelector('input[data-col="text_mkptfrq1"]');
-            const statusSel = row.querySelector('select[data-col="status"]');
-            if (!input || !statusSel) return;
+        const comment = input.value;
+        const status = select.value;
 
-            const comment = input.value;
-            const status = statusSel.value;
-
-            await fetch('/.netlify/functions/update-item', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                itemId: id,
-                columnId: 'text_mkptfrq1',
-                value: JSON.stringify(comment)
-              })
-            });
-
-            await fetch('/.netlify/functions/update-item', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                itemId: id,
-                columnId: 'status',
-                value: JSON.stringify({ label: status })
-              })
-            });
-
-            btn.textContent = '✓ Saved';
-            setTimeout(() => btn.textContent = 'Save', 1500);
-          };
+        await fetch('/.netlify/functions/update-item', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            itemId: id,
+            columnId: 'text_mkptfrq1',
+            value: JSON.stringify(comment)
+          })
         });
 
-        const createBtn = document.getElementById('create-button');
-        if (createBtn) {
-          createBtn.onclick = async () => {
-            const nameInput = document.getElementById('new-item-name');
-            const commentInput = document.getElementById('new-item-comment');
-            const statusInput = document.getElementById('new-item-status');
+        await fetch('/.netlify/functions/update-item', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            itemId: id,
+            columnId: 'status',
+            value: JSON.stringify({ label: status })
+          })
+        });
 
-            if (!nameInput || !commentInput || !statusInput) return;
+        btn.textContent = '✓ Saved';
+        setTimeout(() => btn.textContent = 'Save', 1500);
+      };
+    });
 
-            const name = nameInput.value.trim();
-            const comment = commentInput.value.trim();
-            const status = statusInput.value;
+    // Bind create button
+    const createBtn = document.getElementById('create-button');
+    if (createBtn) {
+      createBtn.onclick = async () => {
+        const name = document.getElementById('new-item-name')?.value.trim();
+        const comment = document.getElementById('new-item-comment')?.value.trim();
+        const status = document.getElementById('new-item-status')?.value;
 
-            if (!name) return;
+        if (!name) return;
 
-            const res = await fetch('/.netlify/functions/create-item', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                query: `mutation {
-                  create_item(board_id: 8773609198, item_name: "${name}") {
-                    id
-                  }
-                }`
-              })
-            });
+        const res = await fetch('/.netlify/functions/create-item', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            query: `mutation {
+              create_item(board_id: 8773609198, item_name: "${name}") {
+                id
+              }
+            }`
+          })
+        });
 
-            const result = await res.json();
-            const id = result?.response?.create_item?.id;
+        const result = await res.json();
+        const id = result?.response?.create_item?.id;
+        if (!id) return;
 
-            if (id) {
-              await fetch('/.netlify/functions/update-item', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  itemId: id,
-                  columnId: 'text_mkptfrq1',
-                  value: JSON.stringify(comment)
-                })
-              });
+        await fetch('/.netlify/functions/update-item', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            itemId: id,
+            columnId: 'text_mkptfrq1',
+            value: JSON.stringify(comment)
+          })
+        });
 
-              await fetch('/.netlify/functions/update-item', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  itemId: id,
-                  columnId: 'status',
-                  value: JSON.stringify({ label: status })
-                })
-              });
+        await fetch('/.netlify/functions/update-item', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            itemId: id,
+            columnId: 'status',
+            value: JSON.stringify({ label: status })
+          })
+        });
 
-              (async () => {
-  const items = await fetchItems();
-  renderTable(items);
-})();
-            }
-          };
-        }
+        fetchItems().then(renderTable);
+      };
+    }
+  }
+
+  fetchItems().then(renderTable);
 </script>
   </body>
 </html>
