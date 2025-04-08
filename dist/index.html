@@ -33,7 +33,7 @@
       function renderTable(items) {
         const root = document.getElementById('table-root');
         const rows = items.map(item => {
-          const textVal = item.column_values.find(col => col.id === 'text')?.text || '';
+          const textVal = item.column_values.find(col => col.id === 'comment')?.text || '';
           const statusObj = item.column_values.find(col => col.id === 'status');
           const status = statusObj?.label || '';
           const badgeColor = statusColors[status] || '#ccc';
@@ -41,7 +41,7 @@
           return `
             <tr data-id="${item.id}">
               <td>${item.name}</td>
-              <td><input value="${textVal}" data-col="text"/></td>
+              <td><input value="${textVal}" data-col="comment"/></td>
               <td>
                 <select data-col="status">
                   <option value="">Select</option>
@@ -75,7 +75,7 @@
               fetch('/.netlify/functions/update-item', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ itemId: id, columnId: 'text', value: JSON.stringify(text) })
+                body: JSON.stringify({ itemId: id, columnId: 'comment', value: JSON.stringify(text) })
               }),
               fetch('/.netlify/functions/update-item', {
                 method: 'POST',
@@ -85,7 +85,7 @@
             ];
 
             await Promise.all(updates);
-            alert('Saved!');
+            btn.innerHTML = '✓ Saved'; setTimeout(() => btn.innerHTML = 'Save', 1500);
           };
         });
       }
