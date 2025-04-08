@@ -11,20 +11,7 @@
         "Stuck": "#e2445c"
       };
     
-        document.getElementById('create-button').onclick = async () => {
-          const name = document.getElementById('new-item-name').value;
-          const comment = document.getElementById('new-item-comment').value;
-          const status = document.getElementById('new-item-status').value;
-
-          if (!name) return alert('Please enter an item name');
-
-          const mutation = {
-            query: `mutation {
-              create_item(board_id: 8773609198, item_name: "${name}") {
-                id
-              }
-            }`
-          };
+        
 
           const res = await fetch('/.netlify/functions/create-item', {
             method: 'POST',
