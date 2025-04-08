@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Editable Monday Table</title>
+    <script>
+      const statusColors = {
+        "Done": "#00c875",
+        "Working on it": "#fdab3d",
+        "Stuck": "#e2445c"
+      };
+    </script>
+    <style>
+      body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #f9fafb; padding: 2rem; }
+      table { width: 100%; border-collapse: collapse; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-radius: 8px; overflow: hidden; }
+      th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+      th { background: #f0f2f5; }
+      select, input { padding: 8px; width: 100%; border: 1px solid #ccc; border-radius: 4px; }
+      .badge { border-radius: 999px; padding: 4px 10px; color: white; display: inline-block; }
+      .btn { background: #0073ea; color: white; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; }
+    </style>
+  </head>
+  <body>
+    <h2 style="margin-bottom: 1rem;">Editable Monday Table</h2>
+    <div id="table-root">Loading...</div>
+    <script>
+      async function fetchItems() {
+        const res = await fetch('/.netlify/functions/get-items');
+        return await res.json();
+      }
+
+      function renderTable(items) {
+        const root = document.getElementById('table-root');
+        const rows = items.map(item => {
+          const textVal = item.column_values.find(col => col.id === 'text')?.text || '';
+          const statusObj = item.column_values.find(col => col.id === 'status');
+          const status = statusObj?.label || '';
+          const badgeColor = statusColors[status] || '#ccc';
+
+          return `
+            <tr data-id="${item.id}">
+              <td>${item.name}</td>
+              <td><input value="${textVal}" data-col="text"/></td>
+              <td>
+                <select data-col="status">
+                  <option value="">Select</option>
+                  <option ${status === 'Done' ? 'selected' : ''}>Done</option>
+                  <option ${status === 'Working on it' ? 'selected' : ''}>Working on it</option>
+                  <option ${status === 'Stuck' ? 'selected' : ''}>Stuck</option>
+                </select>
+              </td>
+              <td><button class="btn">Save</button></td>
+            </tr>
+          `;
+        }).join("");
+
+        root.innerHTML = `
+          <table>
+            <thead>
+              <tr><th>Item</th><th>Text</th><th>Status</th><th>Actions</th></tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        `;
+
+        document.querySelectorAll('button.btn').forEach(btn => {
+          btn.onclick = async () => {
+            const row = btn.closest('tr');
+            const id = row.dataset.id;
+            const text = row.querySelector('input[data-col="text"]').value;
+            const status = row.querySelector('select[data-col="status"]').value;
+
+            const updates = [
+              fetch('/.netlify/functions/update-item', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ itemId: id, columnId: 'text', value: JSON.stringify(text) })
+              }),
+              fetch('/.netlify/functions/update-item', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ itemId: id, columnId: 'status', value: JSON.stringify({ label: status }) })
+              })
+            ];
+
+            await Promise.all(updates);
+            alert('Saved!');
+          };
+        });
+      }
+
+      fetchItems().then(renderTable).catch(err => {
+        document.getElementById('table-root').textContent = 'Failed to load items.';
+        console.error(err);
+      });
+    </script>
+  </body>
+</html>
