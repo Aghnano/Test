@@ -68,7 +68,7 @@
           btn.onclick = async () => {
             const row = btn.closest('tr');
             const id = row.dataset.id;
-            const text = row.querySelector('input[data-col="text"]').value;
+            const text = row.querySelector('input[data-col="comment"]').value;
             const status = row.querySelector('select[data-col="status"]').value;
 
             const updates = [
@@ -85,7 +85,7 @@
             ];
 
             await Promise.all(updates);
-            btn.innerHTML = '✓ Saved'; setTimeout(() => btn.innerHTML = 'Save', 1500);
+            btn.textContent = '✓ Saved'; setTimeout(() => btn.textContent = 'Save', 1500);
           };
         });
       }
